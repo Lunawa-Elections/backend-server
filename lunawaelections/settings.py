@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'lunawaelections',
 ]
 
 MIDDLEWARE = [
@@ -148,9 +149,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'uploads')
 PROCESS_ROOT = os.path.join(MEDIA_ROOT, 'processed')
 REFERENCE_ROOT = os.path.join(MEDIA_ROOT, 'reference')
+DELETE_ROOT = os.path.join(MEDIA_ROOT, 'deleted')
 
 os.makedirs(UPLOAD_ROOT, exist_ok=True)
 os.makedirs(PROCESS_ROOT, exist_ok=True)
 os.makedirs(REFERENCE_ROOT, exist_ok=True)
+os.makedirs(DELETE_ROOT, exist_ok=True)
 
 django_on_heroku.settings(locals())

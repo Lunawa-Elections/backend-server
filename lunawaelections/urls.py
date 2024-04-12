@@ -21,4 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', views.auth, name='auth'),
     path('upload/', views.upload, name='upload'),
+    path('counter/<str:android_id>/', views.counter, name='counter'),
+    path('delete/<str:android_id>/', views.delete, name='delete'),
 ]
