@@ -2,9 +2,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, HttpResponse
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
 from django.conf import settings
-import subprocess, threading
 import logging, json, os
 from . import models
 
@@ -93,37 +91,3 @@ def delete(request, android_id):
 
     logger.debug(f"Delete Api: {response.content}")
     return response
-
-@csrf_exempt
-@require_http_methods(["GET"])
-def stats(request):
-    try:
-        members = models.Member.objects.all()
-        response_data = "\n".join(str(member) for member in members)
-        response = HttpResponse(response_data, content_type="text/csv", status=200)
-    except Exception as e:
-        logger.error(f"Error occurred during stats: {e}", exc_info=True)
-        response = HttpResponse("Failure", status=401)
-
-    logger.debug(f"Stats Api: {response.content}")
-    return response
-
-def run_streamlit():
-    command = ["streamlit", "run", "streamlit.py"]
-    result = subprocess.run(command, capture_output=True, text=True)
-    if result.returncode == 0:
-        print("Streamlit Started")
-    else:
-        print("STDOUT:")
-        print(result.stdout)
-        print("STDERR:")
-        print(result.stderr)
-
-@csrf_exempt
-@require_http_methods(["GET"])
-def streamlit(request):
-    if not settings.STREAMLIT_RUN:
-        settings.STREAMLIT_RUN = True
-        thread = threading.Thread(target=run_streamlit)
-        thread.start()
-    return render(request, 'streamlit.html')

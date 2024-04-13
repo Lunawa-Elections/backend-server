@@ -1,0 +1,53 @@
+{
+    "A": {
+        "name": "Baree Vaas",
+        "1": "Bharat Kumar",
+        "2": "Deepak Kumar",
+        "3": "Ramanlal",
+        "4": "Vasant Lumar"
+    },
+    "B": {
+        "name": "Vachali Vaas",
+        "5": "Champaklal",
+        "6": "Kiran",
+        "7": "Rakesh Kumar",
+        "8": "Shantilal",
+        "9": "Yugraj"
+    },
+    "C": {
+        "name": "Gandhi Vaas",
+        "10": "Himmatmal",
+        "11": "Indermal",
+        "12": "Jayantilal",
+        "13": "Jitendra Kumar",
+        "14": "Pravin",
+        "15": "Raju",
+        "16": "Surendra"
+    },
+    "D": {
+        "name": "Menoki Vaas",
+        "17": "Babulal",
+        "18": "Suresh"
+    },
+    "E": {
+        "name": "Kotdi Vaas",
+        "19": "Babulal",
+        "20": "Mahendra"
+    },
+    "F": {
+        "name": "Chakki Vaas",
+        "21": "Sankalchand",
+        "22": "Suresh Kumar"
+    },
+    "G": {
+        "name": "Kubharo Vaas",
+        "23": "Mangilal",
+        "24": "Sukanraj"
+    },
+    "H": {
+        "name": "Mahavir Vaas",
+        "25": "Amritlal",
+        "26": "Shantilal",
+        "27": "Shontilal"
+    }
+}

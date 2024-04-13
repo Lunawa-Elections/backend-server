@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'lunawaelections',
+    'lunawaelections.apps.LunawaElectionsConfig'
 ]
 
 MIDDLEWARE = [
@@ -155,5 +155,7 @@ os.makedirs(UPLOAD_ROOT, exist_ok=True)
 os.makedirs(PROCESS_ROOT, exist_ok=True)
 os.makedirs(REFERENCE_ROOT, exist_ok=True)
 os.makedirs(DELETE_ROOT, exist_ok=True)
+
+STREAMLIT_RUN = False
 
 django_on_heroku.settings(locals())

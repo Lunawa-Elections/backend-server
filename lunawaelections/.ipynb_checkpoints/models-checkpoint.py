@@ -15,12 +15,12 @@ class AndroidID(models.Model):
 
 class Member(models.Model):
     loc = models.CharField(max_length=50)
-    name = models.CharField(max_length=255, default="")
-    vaas = models.CharField(max_length=255, default="")
+    name = models.CharField(max_length=255)
+    vaas = models.CharField(max_length=255)
     votes = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.loc},{self.name},{self.vaas},{self.votes}"
+        return f"{self.vaas}->{self.loc}: {self.name} = {self.votes}"
 
 class Image(models.Model):
     name = models.CharField(max_length=255)

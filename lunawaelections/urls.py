@@ -23,4 +23,6 @@ urlpatterns = [
     path('upload/', views.upload, name='upload'),
     path('counter/<str:android_id>/', views.counter, name='counter'),
     path('delete/<str:android_id>/', views.delete, name='delete'),
+    path('stats/', views.stats, name='stats'),
+    path('', views.streamlit, name='streamlit'),
 ]
