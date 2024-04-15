@@ -99,7 +99,7 @@ def check_valid(name):
     thresholds = [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
     final_image, max_score = None, -1
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
         for future in concurrent.futures.as_completed(futures):
             image, valid, score = future.result()
@@ -130,23 +130,15 @@ def get_outliers(members, threshold_ratio=0.8):
     return outliers
 
 def draw_bbox(image):
-    members = {}
-    color = {}
-    futures = []
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        for key, values in bbox_data.items():
-            for sub_key, sub_value in values.items():
-                color[sub_key] = (0, 0, 0)
-                if len(key) == 1:
-                    color[sub_key] = (0, 0, 255)
-                    if sub_key.isdigit():
-                        color[sub_key] = (255, 0, 0)
-                        future = executor.submit(get_member, image, sub_value)
-                        futures.append((future, sub_key))
-
-        for future, sub_key in futures:
-            members[sub_key] = future.result()
+    members, color = {}, {}
+    for key, values in bbox_data.items():
+        for sub_key, sub_value in values.items():
+            color[sub_key] = (0, 0, 0)
+            if len(key) == 1:
+                color[sub_key] = (0, 0, 255)
+                if sub_key.isdigit():
+                    color[sub_key] = (255, 0, 0)
+                    members[sub_key] = get_member(image, sub_value)
 
     outliers = get_outliers(members)
     for out in outliers: 
@@ -156,7 +148,7 @@ def draw_bbox(image):
     for key, values in bbox_data.items():
         for sub_key, sub_value in values.items():
             cv2.rectangle(image, sub_value[0], sub_value[1], color[sub_key], 5)
-
+    
     return image, outliers
 
 def img_display(img, name='Image'):
@@ -176,6 +168,6 @@ if __name__ == '__main__':
         img_display(image, file_name)
         print(members)
 
-    for i in range(10):
-        image = check_valid(f'../Data/test_{i+1}.jpg')
-        if image is not None: img_display(draw_bbox(image)[0], file_name)
+    # for i in range(10):
+    #     image = check_valid(f'../Data/test_{i+1}.jpg')
+    #     if image is not None: img_display(draw_bbox(image)[0], file_name)
