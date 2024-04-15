@@ -130,15 +130,23 @@ def get_outliers(members, threshold_ratio=0.8):
     return outliers
 
 def draw_bbox(image, bbox_data):
-    members, color = {}, {}
-    for key, values in bbox_data.items():
-        for sub_key, sub_value in values.items():
-            color[sub_key] = (0, 0, 0)
-            if len(key) == 1:
-                color[sub_key] = (0, 0, 255)
-                if sub_key.isdigit():
-                    color[sub_key] = (255, 0, 0)
-                    members[sub_key] = get_member(image, sub_value)
+    members = {}
+    color = {}
+    futures = []
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for key, values in bbox_data.items():
+            for sub_key, sub_value in values.items():
+                color[sub_key] = (0, 0, 0)
+                if len(key) == 1:
+                    color[sub_key] = (0, 0, 255)
+                    if sub_key.isdigit():
+                        color[sub_key] = (255, 0, 0)
+                        future = executor.submit(get_member, image, sub_value)
+                        futures.append((future, sub_key))
+
+        for future, sub_key in futures:
+            members[sub_key] = future.result()
 
     outliers = get_outliers(members)
     for out in outliers: 
@@ -148,7 +156,7 @@ def draw_bbox(image, bbox_data):
     for key, values in bbox_data.items():
         for sub_key, sub_value in values.items():
             cv2.rectangle(image, sub_value[0], sub_value[1], color[sub_key], 5)
-    
+
     return image, outliers
 
 def img_display(img, name='Image'):
