@@ -99,7 +99,7 @@ def check_valid(name):
     thresholds = [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
     final_image, max_score = None, -1
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
         for future in concurrent.futures.as_completed(futures):
             image, valid, score = future.result()
@@ -134,7 +134,7 @@ def draw_bbox(image, bbox_data):
     color = {}
     futures = []
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=9) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         for key, values in bbox_data.items():
             for sub_key, sub_value in values.items():
                 color[sub_key] = (0, 0, 0)
