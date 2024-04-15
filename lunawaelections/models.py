@@ -46,10 +46,10 @@ class Image(models.Model):
                         member = Member.objects.get(loc=mid)
                         member.votes += 1
                         member.save()
-                        self.status = "Processed"
                     except Exception as e:
                         logger.error(f"Error occurred during update: {e}", exc_info=True)
-            
+                self.status = "Processed"
+                
         super(Image, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):

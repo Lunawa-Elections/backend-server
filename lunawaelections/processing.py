@@ -92,7 +92,7 @@ def img_proc(name):
     mse = ((bin_img - bin_ref) ** 2).mean()
     psnr = cv2.PSNR(bin_img, bin_ref)
     score = sim/0.3 + psnr/6 - mse/0.35
-    validity = True if score>1.5 else False
+    validity = True if score>1.2 else False
 
     # print(f'{name}: {round(score,2)} - {validity}')
     return image, validity
@@ -143,7 +143,7 @@ def img_display(img, name='Image'):
     cv2.destroyAllWindows()
 
 bbox_data, shape, crop_ref, bin_ref, (p, q, r, s) = get_reference()
-thresholds = [160, 155, 165, 150, 170]
+thresholds = [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
 threshold = 160
 
 if __name__ == '__main__':
