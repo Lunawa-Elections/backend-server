@@ -64,7 +64,7 @@ def wrap_image(image, max_quad):
 
         warped_image2 = cv2.rotate(warped_image, cv2.ROTATE_90_CLOCKWISE)
         crop_wrp2 = warped_image2[p:q, r:s]
-        ssim_score2 = ssimssim(crop_wrp2, crop_ref)
+        ssim_score2 = ssim(crop_wrp2, crop_ref)
         
         warped_image = warped_image1 if ssim_score1 > ssim_score2 else warped_image2
 
