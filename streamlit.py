@@ -19,7 +19,7 @@ def fetch_data(url):
     
 def main():
     col1, col2, col3 = st.columns(3)
-    api_url = col1.text_input('Enter the API URL', 'http://localhost:8000/')
+    api_url = col1.text_input('Enter the API URL', 'http://localhost/')
     reload_time = col2.text_input('Auto Reload Dashboard (in Seconds)', '5')
     # auto_reload = col3.checkbox("Auto-reload data", value=False)
 
