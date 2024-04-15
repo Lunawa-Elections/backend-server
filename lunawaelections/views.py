@@ -51,7 +51,7 @@ def upload(request):
                     return response
                 
         except Exception as e:
-            logger.error(f"Error occurred during deletion: {e}", exc_info=True)
+            logger.error(f"Error occurred during upload: {e}", exc_info=True)
 
         response = HttpResponse("Invalid Image", status=400)
     else:
@@ -67,7 +67,7 @@ def counter(request, android_id):
         counter = models.AndroidID.objects.get_or_create(name=android_id)[0].counter
         response = HttpResponse(counter, status=200)
     except Exception as e:
-        logger.error(f"Error occurred during deletion: {e}", exc_info=True)
+        logger.error(f"Error occurred during counter: {e}", exc_info=True)
         response = HttpResponse("Failure", status=401)
 
     logger.debug(f"Counter Api: {response.content}")

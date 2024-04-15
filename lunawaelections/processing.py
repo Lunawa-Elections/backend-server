@@ -107,11 +107,33 @@ def check_valid(name):
 
     return False
 
+def get_member(image, sub_value):
+    cropped_image = image[sub_value[0][1]:sub_value[1][1], sub_value[0][0]:sub_value[1][0]]
+    gray_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
+    _, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
+    number_of_black_pix = np.sum(binary_image == 0)
+    total_pixels = binary_image.size
+    percentage_of_black = round((number_of_black_pix / total_pixels) * 100, 2)
+    if percentage_of_black >= 15: return True
+    return False
+
 def draw_bbox(image):
+    members = []
     for key, value in bbox_data.items():
         for sub_key, sub_value in value.items():
-            cv2.rectangle(image, sub_value[0], sub_value[1], (255, 255, 255), 5)
-    return image
+            color = (255, 255, 255)
+            if len(key) == 1 and sub_key.isdigit():
+                flag = get_member(image, sub_value)
+                if flag: 
+                    members.append(sub_key)
+                    color = (0, 255, 0)
+            elif len(key) != 1:
+                color = (0, 0, 0)
+            elif not sub_key.isdigit():
+                color = (255, 255, 0)
+
+            cv2.rectangle(image, sub_value[0], sub_value[1], color, 5)
+    return image, members
 
 def img_display(img, name='Image'):
     cv2.namedWindow(name, cv2.WINDOW_NORMAL)
@@ -128,5 +150,5 @@ if __name__ == '__main__':
     file_name = f'test/test_3.jpg'
     image = check_valid(file_name)
     if image is not False:
-        image = draw_bbox(image)
+        image, _ = draw_bbox(image)
         img_display(image, file_name)
