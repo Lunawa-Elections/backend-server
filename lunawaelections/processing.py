@@ -129,7 +129,7 @@ def get_outliers(members, threshold_ratio=0.8):
 
     return outliers
 
-def draw_bbox(image, bbox_data):
+def draw_bbox(image):
     members = {}
     color = {}
     futures = []
@@ -172,10 +172,10 @@ if __name__ == '__main__':
     file_name = 'ballot_a3.jpg' # 'ballot_3d9c889f0fc3ec64_20240415_235845.jpg'
     image = check_valid(file_name)
     if image is not None:
-        image, members = draw_bbox(image, bbox_data)
+        image, members = draw_bbox(image)
         img_display(image, file_name)
         print(members)
 
     for i in range(10):
         image = check_valid(f'../Data/test_{i+1}.jpg')
-        if image is not None: img_display(draw_bbox(image, bbox_data)[0], file_name)
+        if image is not None: img_display(draw_bbox(image)[0], file_name)
