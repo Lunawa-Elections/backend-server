@@ -99,26 +99,28 @@ def check_valid(name):
     thresholds = [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
     final_image, max_score = None, -1
 
-    for thres in thresholds:
-        image, valid, score = img_proc(name, thres)
-        if valid and score > max_score:
-            max_score = score
-            final_image = image
+    # for thres in thresholds:
+    #     image, valid, score = img_proc(name, thres)
+    #     if valid and score > max_score:
+    #         max_score = score
+    #         final_image = image
 
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-    #     futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
-    #     for future in concurrent.futures.as_completed(futures):
-    #         image, valid, score = future.result()
-    #         if valid and score > max_score:
-    #             max_score = score
-    #             final_image = image
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
+        for future in concurrent.futures.as_completed(futures):
+            image, valid, score = future.result()
+            if valid and score > max_score:
+                max_score = score
+                final_image = image
 
     return final_image
 
 def get_member(image, sub_value):
-    cropped_image = image[sub_value[0][1]:sub_value[1][1], sub_value[0][0]:sub_value[1][0]]
-    _, binary_image = cv2.threshold(cropped_image, 127, 255, cv2.THRESH_BINARY_INV)
-    return np.mean(binary_image == 255) * 100
+    if image is not None and sub_value is not None:
+        cropped_image = image[sub_value[0][1]:sub_value[1][1], sub_value[0][0]:sub_value[1][0]]
+        _, binary_image = cv2.threshold(cropped_image, 127, 255, cv2.THRESH_BINARY_INV)
+        return np.mean(binary_image == 255) * 100
+    return 0
 
 def get_outliers(members, threshold_ratio=0.8):
     outliers = []
