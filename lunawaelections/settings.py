@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # 'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'lunawaelections.apps.LunawaElectionsConfig'
 ]
 
@@ -138,7 +138,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-# STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -149,13 +149,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'uploads')
 PROCESS_ROOT = os.path.join(MEDIA_ROOT, 'processed')
 REFERENCE_ROOT = os.path.join(MEDIA_ROOT, 'reference')
-DELETE_ROOT = os.path.join(MEDIA_ROOT, 'deleted')
 
 os.makedirs(UPLOAD_ROOT, exist_ok=True)
 os.makedirs(PROCESS_ROOT, exist_ok=True)
 os.makedirs(REFERENCE_ROOT, exist_ok=True)
-os.makedirs(DELETE_ROOT, exist_ok=True)
 
-STREAMLIT_RUN = True
+STREAMLIT_RUN = False
 
 # django_on_heroku.settings(locals())

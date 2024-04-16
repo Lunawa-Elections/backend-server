@@ -1,7 +1,9 @@
 from django.conf import settings
+from django.db.models import F
 from django.db import models
 from . import processing
 import os, shutil, cv2
+import threading
 import logging
 
 logger = logging.getLogger('lunawaelections')
@@ -35,35 +37,30 @@ class Image(models.Model):
         if not self.pk:
             self.status = "Invalid"
             file_path = os.path.join(settings.UPLOAD_ROOT, self.name)
-            out_path = os.path.join(settings.PROCESS_ROOT, self.name)
             image = processing.check_valid(file_path)
+
             if image is not False:
-                image, members = processing.draw_bbox(image)
-                self.voted_members = members
-                cv2.imwrite(out_path, image)
-                for mid in members:
-                    try:
-                        member = Member.objects.get(loc=mid)
-                        member.votes += 1
-                        member.save()
-                    except Exception as e:
-                        logger.error(f"Error occurred during update: {e}", exc_info=True)
                 self.status = "Processed"
+                threading.Thread(target=self.post_process, args=(image,)).start()
                 
         super(Image, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
-        if self.voted_members:
-            for mid in self.voted_members:
-                member = Member.objects.get(loc=mid)
-                member.votes = max(0, member.votes-1)
-                member.save()
-        try:
-            source_path = os.path.join(settings.UPLOAD_ROOT, self.name)
-            destination_path = os.path.join(settings.DELETE_ROOT, self.name)
-            os.remove(os.path.join(settings.PROCESS_ROOT, self.name))
-            shutil.move(source_path, destination_path)
-        except Exception as e:
-            logger.error(f"Error occurred during deletion: {e}", exc_info=True)
+        Member.objects.filter(loc__in=self.voted_members).update(votes=F('votes') - 1)
+        shutil.rmtree(os.path.join(settings.PROCESS_ROOT, self.name), ignore_errors=True)
+        shutil.rmtree(os.path.join(settings.UPLOAD_ROOT, self.name), ignore_errors=True)
 
         super(Image, self).delete(*args, **kwargs)
+
+    def post_process(self, image):
+        out_path = os.path.join(settings.PROCESS_ROOT, self.name)
+        self.android_id.counter += 1
+        self.android_id.save()
+
+        image, members = processing.draw_bbox(image)
+        self.voted_members = members
+        Member.objects.filter(loc__in=members).update(votes=F('votes') + 1)
+
+        cv2.imwrite(out_path, image)
+        self.status = "Parsed"
+        self.save(update_fields=['status', 'voted_members'])

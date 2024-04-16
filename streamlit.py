@@ -5,12 +5,12 @@ import streamlit as st
 import pandas as pd
 import requests, io
 
+st.set_page_config(page_title="Voting Dashboard", layout="wide")
 column_names = ['Num', 'Name', 'Vaas', 'Votes']
-st.set_page_config(page_title="Voting Data Dashboard", layout="wide")
 
-def fetch_data(url):
+def fetch_data():
     try:
-        response = requests.get(url+'stats/')
+        response = requests.get('http://localhost/stats/')
         if response.status_code == 200:
             return response.text
     except:
@@ -18,24 +18,7 @@ def fetch_data(url):
         return None
     
 def main():
-    col1, col2, col3 = st.columns(3)
-    api_url = col1.text_input('Enter the API URL', 'https://lunawaelections-a3ea5ed4a880.herokuapp.com/')
-    reload_time = col2.text_input('Auto Reload Dashboard (in Seconds)', '5')
-    # auto_reload = col3.checkbox("Auto-reload data", value=False)
-
-    with col3:
-        col3_row1 = st.columns(1)
-        with col3_row1[0]:
-            auto_reload = st.checkbox("Auto-reload data", value=False)
-
-        col3_row2 = st.columns(1)
-        with col3_row2[0]:
-            reload = st.button('Reload Now')
-
-
-    if auto_reload: st_autorefresh(interval=int(reload_time)*1000, key='data_refresh')
-
-    csv_data = fetch_data(api_url)
+    csv_data = fetch_data()
     if csv_data:
         data = pd.read_csv(io.StringIO(csv_data), names=column_names, index_col="Num")
         data["Name"] = data["Name"].str.split(' ').str[0]
@@ -50,11 +33,11 @@ def main():
                     marker=dict(color=px.colors.qualitative.Plotly)
                 )
             ])
+            angle = -45 if len(group['Name']) > 3 else 0
             fig.update_layout(
                 title=f"Votes for {name}",
-                xaxis_title="Member Name",
                 yaxis_title="Votes",
-                xaxis_tickangle=-10,
+                xaxis_tickangle=angle,
                 yaxis=dict(dtick=1),
                 height=300,
                 width=300
@@ -65,6 +48,10 @@ def main():
         for row, fig in zip(sum(rows, []), plots):
             with row:
                 st.plotly_chart(fig, use_container_width=True)
-
+    
 if __name__ == '__main__':
+    col1, col2 = st.columns([5, 1])
+    col1.title("Lunawa Voting Dashboard")
+    if col2.button('Reload'): st.experimental_rerun()
     main()
+    st_autorefresh(interval=30000, key='data_refresh')

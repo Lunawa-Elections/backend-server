@@ -37,27 +37,37 @@ def upload(request):
             default_storage.save(file_path, image)
 
             androidDevice = image.name.split('_')[1]
-            android_id, created = models.AndroidID.objects.get_or_create(name=androidDevice)
-
+            android_id = models.AndroidID.objects.get_or_create(name=androidDevice)[0]
             new_image = models.Image.objects.create(name=image.name, android_id=android_id)
-            out_path = os.path.join(settings.PROCESS_ROOT, image.name)
-            if new_image.status == "Processed":
-                android_id.counter += 1
-                android_id.save()
-
-                with open(out_path, 'rb') as f:
-                    response = HttpResponse(f.read(), content_type="image/jpeg", status=200)
-                    logger.debug(f"Upload Api: {response}")
-                    return response
+            if new_image.status != "Invalid":
+                response = HttpResponse("Upload Successfully", status=200)
                 
         except Exception as e:
             logger.error(f"Error occurred during upload: {e}", exc_info=True)
-
-        response = HttpResponse("Invalid Image", status=400)
+            response = HttpResponse("Invalid Image", status=400)
     else:
         response = HttpResponse("No Image", status=400)
     
     logger.debug(f"Upload Api: {response.content}")
+    return response
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_image(request, img_name):
+    try:
+        out_path = os.path.join(settings.PROCESS_ROOT, img_name)
+        if os.path.exists(out_path):
+            with open(out_path, 'rb') as f:
+                response = HttpResponse(f.read(), content_type="image/jpeg", status=200)
+                logger.debug(f"Get image Api: {response}")
+                return response
+        elif models.Image.objects.get(name=img_name).status == "Processing":
+                response = HttpResponse("Try again", status=401)
+    except Exception as e:
+        logger.error(f"Error occurred during get image: {e}", exc_info=True)
+        response = HttpResponse("Failure", status=401)
+
+    logger.debug(f"Get image Api: {response.content}")
     return response
 
 @csrf_exempt
@@ -109,7 +119,7 @@ def stats(request):
     return response
 
 def run_streamlit():
-    command = ["streamlit", "run", "streamlit.py"]
+    command = "streamlit run app.py --server.address 0.0.0.0 --server.port 8501".split(" ")
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode == 0:
         print("Streamlit Started")
@@ -124,6 +134,11 @@ def run_streamlit():
 def streamlit(request):
     if not settings.STREAMLIT_RUN:
         settings.STREAMLIT_RUN = True
-        thread = threading.Thread(target=run_streamlit)
-        thread.start()
-    return render(request, 'streamlit.html')
+        threading.Thread(target=run_streamlit).start()
+
+    scheme = request.scheme
+    host_header = request.META.get('HTTP_HOST', 'localhost')
+    host = host_header.split(':')[0]
+    # port = '80' if scheme == 'http' else '443'
+    full_url = f"{scheme}://{host}:8501/"
+    return render(request, 'streamlit.html', {'full_url': full_url})
