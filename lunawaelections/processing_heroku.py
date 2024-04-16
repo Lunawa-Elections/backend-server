@@ -81,13 +81,43 @@ def wrap_image(image, max_quad):
     warped_image = warped_image1 if ssim_score1 > ssim_score2 else warped_image2
     return warped_image
 
+def img_proc(name):
+    image = cv2.imread(name, cv2.IMREAD_GRAYSCALE)
+    _, bin_img = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
+    max_quad = get_contour(bin_img)
+    if max_quad is None: return None, False, 0
+        
+    image = wrap_image(image, max_quad)
+    _, bin_img = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
+    
+    sim = ssim(bin_img, bin_ref)
+    mse = ((bin_img - bin_ref) ** 2).mean()
+    psnr = cv2.PSNR(bin_img, bin_ref)
+    score = sim/0.35 + psnr/5 - mse/0.3
+    validity = True # if score>1.2 else False
+    # print(f'{threshold}, sim: {sim}, mse: {mse}, psnr: {psnr}, score: {score}')
+    return image, validity, score
+
 def check_valid(name):
-    try:
-        image = cv2.imread(name, cv2.IMREAD_GRAYSCALE)
-        _, bin_img = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
-        max_quad = get_contour(bin_img)
-        image = wrap_image(image, max_quad)
-    except: image = None
+    # thresholds = [160] # [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
+    # final_image, max_score = None, -1
+
+    # for thres in thresholds:
+    #     image, valid, score = img_proc(name, thres)
+    #     if valid and score > max_score:
+    #         max_score = score
+    #         final_image = image
+
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
+    #     for future in concurrent.futures.as_completed(futures):
+    #         image, valid, score = future.result()
+    #         if valid and score > max_score:
+    #             max_score = score
+    #             final_image = image
+                
+    # print(max_score)
+    image, valid, score = img_proc(name)
     return image
 
 def get_member(image, sub_value):
