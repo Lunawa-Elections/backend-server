@@ -156,4 +156,4 @@ os.makedirs(REFERENCE_ROOT, exist_ok=True)
 
 STREAMLIT_RUN = False
 
-django_on_heroku.settings(locals())
+# django_on_heroku.settings(locals())

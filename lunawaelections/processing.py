@@ -97,22 +97,22 @@ def img_proc(name, threshold):
     return image, validity, score
 
 def check_valid(name):
-    thresholds = [160, 155, 165] # [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
+    thresholds = [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
     final_image, max_score = None, -1
 
-    for thres in thresholds:
-        image, valid, score = img_proc(name, thres)
-        if valid and score > max_score:
-            max_score = score
-            final_image = image
+    # for thres in thresholds:
+    #     image, valid, score = img_proc(name, thres)
+    #     if valid and score > max_score:
+    #         max_score = score
+    #         final_image = image
 
-    # with concurrent.futures.ThreadPoolExecutor() as executor:
-    #     futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
-    #     for future in concurrent.futures.as_completed(futures):
-    #         image, valid, score = future.result()
-    #         if valid and score > max_score:
-    #             max_score = score
-    #             final_image = image
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = {executor.submit(img_proc, name, thres): thres for thres in thresholds}
+        for future in concurrent.futures.as_completed(futures):
+            image, valid, score = future.result()
+            if valid and score > max_score:
+                max_score = score
+                final_image = image
                 
     # print(max_score)
     return final_image
