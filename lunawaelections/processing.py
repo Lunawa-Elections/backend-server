@@ -97,7 +97,7 @@ def img_proc(name, threshold):
     return image, validity, score
 
 def check_valid(name):
-    thresholds = [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
+    thresholds = [160, 155, 165] # [160, 155, 165, 150, 170, 145, 175, 140, 180, 135, 185, 130, 190, 125, 200]
     final_image, max_score = None, -1
 
     for thres in thresholds:

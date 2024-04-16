@@ -1,11 +1,11 @@
-# from streamlit_autorefresh import st_autorefresh
+from streamlit_autorefresh import st_autorefresh
 import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 import pandas as pd
 import requests, io
 
-# st.set_page_config(page_title="Voting Dashboard", layout="wide")
+st.set_page_config(page_title="Voting Dashboard", layout="wide")
 column_names = ['Num', 'Name', 'Vaas', 'Votes']
 
 def fetch_data():
@@ -54,4 +54,4 @@ if __name__ == '__main__':
     col1.title("Lunawa Voting Dashboard")
     if col2.button('Reload'): st.experimental_rerun()
     main()
-    # st_autorefresh(interval=30000, key='data_refresh')
+    st_autorefresh(interval=30000, key='data_refresh')
