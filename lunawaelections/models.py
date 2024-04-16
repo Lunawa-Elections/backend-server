@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger('lunawaelections')
 
 class AndroidID(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     counter = models.IntegerField(default=0)
 
     def __str__(self):
