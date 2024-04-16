@@ -5,7 +5,7 @@ import streamlit as st
 import pandas as pd
 import requests, io
 
-st.set_page_config(page_title="Voting Dashboard", layout="wide")
+# st.set_page_config(page_title="Voting Dashboard", layout="wide")
 column_names = ['Num', 'Name', 'Vaas', 'Votes']
 
 def fetch_data():
