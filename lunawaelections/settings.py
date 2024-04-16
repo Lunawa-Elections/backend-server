@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
-# import django_on_heroku
+import django_on_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -156,4 +156,4 @@ os.makedirs(REFERENCE_ROOT, exist_ok=True)
 
 STREAMLIT_RUN = False
 
-# django_on_heroku.settings(locals())
+django_on_heroku.settings(locals())
