@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
-import django_on_heroku
+# import django_on_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # 'django.contrib.staticfiles',
     'lunawaelections.apps.LunawaElectionsConfig'
 ]
 
@@ -138,7 +138,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -156,6 +156,6 @@ os.makedirs(PROCESS_ROOT, exist_ok=True)
 os.makedirs(REFERENCE_ROOT, exist_ok=True)
 os.makedirs(DELETE_ROOT, exist_ok=True)
 
-STREAMLIT_RUN = False
+STREAMLIT_RUN = True
 
-django_on_heroku.settings(locals())
+# django_on_heroku.settings(locals())
