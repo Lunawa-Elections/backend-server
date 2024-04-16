@@ -130,7 +130,3 @@ if __name__ == '__main__':
         image, members = draw_bbox(image)
         img_display(image, file_name)
         print(members)
-
-    # for i in range(10):
-    #     image = check_valid(f'../Data/test_{i+1}.jpg')
-    #     if image is not None: img_display(draw_bbox(image)[0], file_name)
