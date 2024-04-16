@@ -92,7 +92,8 @@ def img_proc(name, threshold):
     mse = ((bin_img - bin_ref) ** 2).mean()
     psnr = cv2.PSNR(bin_img, bin_ref)
     score = sim/0.35 + psnr/5 - mse/0.3
-    validity = True if score>1.2 else False
+    validity = True # if score>1.2 else False
+    # print(f'{threshold}, sim: {sim}, mse: {mse}, psnr: {psnr}, score: {score}')
     return image, validity, score
 
 def check_valid(name):
@@ -106,50 +107,31 @@ def check_valid(name):
             if valid and score > max_score:
                 max_score = score
                 final_image = image
-
+                
+    # print(max_score)
     return final_image
 
 def get_member(image, sub_value):
     if image is not None and sub_value is not None:
         cropped_image = image[sub_value[0][1]:sub_value[1][1], sub_value[0][0]:sub_value[1][0]]
-        _, binary_image = cv2.threshold(cropped_image, 127, 255, cv2.THRESH_BINARY_INV)
-        return np.mean(binary_image == 255) * 100
-    return 0
-
-def get_outliers(members, threshold_ratio=0.8):
-    outliers = []
-    values = np.array(list(members.values()))
-
-    while True:
-        mean = np.mean(values)
-        std = np.std(values)
-        
-        if std < threshold_ratio * mean: break
-        max_distance_index = np.argmax(values - mean)
-        values = np.delete(values, max_distance_index)
-        outliers.append(list(members.keys())[max_distance_index])
-
-    return outliers
+        _, binary_image = cv2.threshold(cropped_image, 160, 255, cv2.THRESH_BINARY)
+        if np.mean(binary_image == 0) > 0.3 : return True
+    return False
 
 def draw_bbox(image):
-    members, color = {}, {}
-    for key, values in bbox_data.items():
-        for sub_key, sub_value in values.items():
-            color[sub_key] = (0, 0, 0)
-            if len(key) == 1:
-                color[sub_key] = (0, 0, 255)
-                if sub_key.isdigit():
-                    color[sub_key] = (255, 0, 0)
-                    members[sub_key] = get_member(image, sub_value)
-
-    outliers = get_outliers(members)
-    for out in outliers: 
-        color[out] = (0, 255, 0)
-
     image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+    outliers, color = [], {}
     for key, values in bbox_data.items():
         for sub_key, sub_value in values.items():
-            cv2.rectangle(image, sub_value[0], sub_value[1], color[sub_key], 5)
+            color = (0, 0, 0)
+            if len(key) == 1:
+                color = (0, 0, 255)
+                if sub_key.isdigit():
+                    color = (255, 0, 0)
+                    if get_member(image, sub_value):
+                        outliers.append(sub_key)
+                        color = (0, 255, 0)
+            cv2.rectangle(image, sub_value[0], sub_value[1], color, 5)
     
     return image, outliers
 

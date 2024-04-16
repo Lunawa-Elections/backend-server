@@ -30,6 +30,7 @@ def auth(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def upload(request):
+    logger.debug(f"Inside upload api:")
     if request.FILES.get('image'):
         try:
             image = request.FILES['image']
@@ -54,6 +55,7 @@ def upload(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def get_image(request, img_name):
+    logger.debug(f"Inside upload api: {img_name}")
     try:
         out_path = os.path.join(settings.PROCESS_ROOT, img_name)
         if os.path.exists(out_path):
@@ -61,13 +63,16 @@ def get_image(request, img_name):
                 response = HttpResponse(f.read(), content_type="image/jpeg", status=200)
                 logger.debug(f"Get image Api: {response}")
                 return response
-        elif models.Image.objects.get(name=img_name).status == "Processing":
+        else:
+            image_model = models.Image.objects.get(name=img_name)
+            if image_model.status == "Proceesing":
                 response = HttpResponse("Try again", status=401)
+                logger.debug(f"Get image Api: {response.content}")
+                return response
     except Exception as e:
         logger.error(f"Error occurred during get image: {e}", exc_info=True)
-        response = HttpResponse("Failure", status=401)
-
-    logger.debug(f"Get image Api: {response.content}")
+    
+    response = HttpResponse("Failure", status=401)
     return response
 
 @csrf_exempt
@@ -83,6 +88,17 @@ def counter(request, android_id):
     logger.debug(f"Counter Api: {response.content}")
     return response
 
+def rm_files(android_id):
+    try:
+        for file in os.listdir(settings.PROCESS_ROOT):
+            if file.split('_')[1] == android_id:
+                os.remove(os.path.join(settings.PROCESS_ROOT, file))
+
+        for file in os.listdir(settings.UPLOAD_ROOT):
+            if file.split('_')[1] == android_id:
+                os.remove(os.path.join(settings.UPLOAD_ROOT, file))
+    except: pass
+
 @csrf_exempt
 @require_http_methods(["GET"])
 def delete(request, android_id):
@@ -96,6 +112,7 @@ def delete(request, android_id):
 
             android.delete()
 
+        threading.Thread(target=rm_files, args=(android_id,)).start()
         response = HttpResponse("Success", status=200)
     except Exception as e:
         logger.error(f"Error occurred during deletion: {e}", exc_info=True)
@@ -111,23 +128,20 @@ def stats(request):
         members = models.Member.objects.all()
         response_data = "\n".join(str(member) for member in members)
         response = HttpResponse(response_data, content_type="text/csv", status=200)
+        logger.debug(f"Stats Api: {response}")
     except Exception as e:
         logger.error(f"Error occurred during stats: {e}", exc_info=True)
         response = HttpResponse("Failure", status=401)
-
-    logger.debug(f"Stats Api: {response.content}")
+        logger.debug(f"Stats Api: {response.content}")
     return response
 
 def run_streamlit():
-    command = "streamlit run app.py --server.address 0.0.0.0 --server.port 8501".split(" ")
+    command = "streamlit run streamlit.py --server.address 0.0.0.0 --server.port 8501".split(" ")
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode == 0:
         print("Streamlit Started")
     else:
-        print("STDOUT:")
-        print(result.stdout)
-        print("STDERR:")
-        print(result.stderr)
+        print(result.stdout, '\n', result.stderr)
 
 @csrf_exempt
 @require_http_methods(["GET"])
